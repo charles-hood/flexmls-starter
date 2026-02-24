@@ -12,7 +12,6 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <!-- Link to the manifest file -->
     <link rel="manifest" href="/manifest.json">
 
     <!-- Favicon -->
@@ -33,353 +32,790 @@
     <meta property="twitter:image" content="https://{{COMPANY_DOMAIN}}/{{OG_IMAGE_FILE}}">
 
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <style>
-        .playfair {
-            font-family: 'Playfair Display', serif;
+        :root {
+            --accent: {{ACCENT_COLOR}};
+            --text-primary: #1a1a1a;
+            --text-secondary: #6b6b6b;
+            --text-tertiary: #999;
+            --bg-primary: #ffffff;
+            --bg-warm: #fafaf8;
+            --border: #e8e6e3;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+            --shadow-md: 0 4px 20px rgba(0,0,0,0.08);
+            --shadow-lg: 0 12px 40px rgba(0,0,0,0.12);
+            --radius-sm: 8px;
+            --radius-md: 16px;
+            --radius-lg: 24px;
+            --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+            --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
         }
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 72px;
-            width: 100%;
-            height: calc(100% - 72px);
-            overflow: auto;
-            background-color: rgba(0,0,0,0.5);
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Outfit', -apple-system, sans-serif;
+            color: var(--text-primary);
+            background: var(--bg-primary);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
         }
-        .iframe-container {
+
+        .playfair { font-family: 'Playfair Display', Georgia, serif; }
+
+        /* ── Header ────────────────────────────── */
+
+        .site-header {
+            background: var(--bg-primary);
+            padding: 0 1.5rem;
+            height: 68px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
             position: relative;
-            width: 100%;
-            height: 100%;
+            z-index: 100;
+            border-bottom: 1px solid var(--border);
+            transition: box-shadow 0.3s ease;
         }
+
+        .header-logo img {
+            height: 52px;
+            width: auto;
+            max-width: 260px;
+            display: block;
+            object-fit: contain;
+        }
+
+        .header-contact {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            letter-spacing: 0.01em;
+        }
+
+        .header-contact a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        .header-contact a:hover { color: var(--text-primary); }
+
+        .header-contact .dot {
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background: var(--border);
+        }
+
+        .header-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--radius-sm);
+            transition: background 0.2s ease;
+            color: var(--text-primary);
+            font-size: 1.1rem;
+        }
+
+        .header-btn:hover { background: var(--bg-warm); }
+
+        .mobile-call {
+            display: none;
+            text-decoration: none;
+            color: var(--text-primary);
+        }
+
+        @media (max-width: 768px) {
+            .header-contact { display: none; }
+            .mobile-call { display: flex; }
+        }
+
+        /* ── Loading Screen ────────────────────── */
+
         .loading-overlay {
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(135deg, #f5f5f5 0%, #ffffff 100%);
+            inset: 0;
+            background: var(--bg-warm);
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            z-index: 10;
-            transition: opacity 0.3s ease-out;
+            z-index: 50;
+            transition: opacity 0.6s var(--ease-out);
         }
+
         .loading-overlay.fade-out {
             opacity: 0;
             pointer-events: none;
         }
+
         .loading-content {
             text-align: center;
+            max-width: 320px;
         }
+
         .loading-logo {
-            width: 200px;
+            width: 180px;
             height: auto;
-            margin-bottom: 2rem;
-            animation: pulse 2s ease-in-out infinite;
+            margin-bottom: 2.5rem;
+            opacity: 0;
+            transform: translateY(8px);
+            animation: fadeUp 0.8s var(--ease-out) 0.2s forwards;
         }
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
+
+        .loading-bar-track {
+            width: 120px;
+            height: 2px;
+            background: var(--border);
+            border-radius: 2px;
+            margin: 0 auto 2rem;
+            overflow: hidden;
+            opacity: 0;
+            animation: fadeIn 0.5s ease 0.6s forwards;
         }
-        .loading-spinner {
-            width: 50px;
-            height: 50px;
-            margin: 0 auto 1rem auto;
-            border: 3px solid #e0e0e0;
-            border-top: 3px solid {{ACCENT_COLOR}};
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
+
+        .loading-bar-fill {
+            width: 30%;
+            height: 100%;
+            background: var(--accent);
+            border-radius: 2px;
+            animation: loadProgress 3s var(--ease-in-out) 0.8s forwards;
         }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
+
         .loading-text {
-            color: #333;
-            font-size: 1.1rem;
-            margin-bottom: 0.5rem;
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 1rem;
+            color: var(--text-primary);
+            margin-bottom: 0.375rem;
+            opacity: 0;
+            transition: opacity 0.25s ease;
+            animation: fadeIn 0.5s ease 0.8s forwards;
         }
+
         .loading-subtext {
-            color: #666;
-            font-size: 0.9rem;
+            font-size: 0.8rem;
+            color: var(--text-tertiary);
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            opacity: 0;
+            transition: opacity 0.25s ease;
+            animation: fadeIn 0.5s ease 1s forwards;
         }
-        .iframe-hidden {
-            visibility: hidden;
+
+        @keyframes fadeUp {
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+        @keyframes loadProgress {
+            0% { width: 30%; }
+            50% { width: 70%; }
+            100% { width: 90%; }
+        }
+
+        /* ── Main / Iframe ─────────────────────── */
+
+        .main-content {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .main-content iframe {
             position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
         }
-        .modal-content {
-            background-color: #fefefe;
-            margin: 0 auto;
-            padding: 20px;
-            border: 1px solid #888;
-            width: 90%;
-            max-width: 800px;
-            max-height: calc(100vh - 92px);
+
+        .iframe-hidden { visibility: hidden; }
+
+        /* ── Modal System ──────────────────────── */
+
+        .modal-backdrop {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 200;
+            background: rgba(0, 0, 0, 0);
+            backdrop-filter: blur(0px);
+            -webkit-backdrop-filter: blur(0px);
+            transition: background 0.3s ease,
+                        backdrop-filter 0.3s ease,
+                        -webkit-backdrop-filter 0.3s ease;
             overflow-y: auto;
+            padding: 68px 1rem 1rem;
         }
-        .close {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
+
+        .modal-backdrop.active {
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
         }
-        .close:hover,
-        .close:focus {
-            color: black;
+
+        .modal-panel {
+            background: var(--bg-primary);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            max-width: 560px;
+            margin: 2rem auto;
+            padding: 2rem;
+            position: relative;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.35s var(--ease-out),
+                        transform 0.35s var(--ease-out);
+        }
+
+        .modal-backdrop.active .modal-panel {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: none;
+            background: var(--bg-warm);
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s ease, color 0.2s ease;
+            line-height: 1;
+        }
+
+        .modal-close:hover {
+            background: var(--border);
+            color: var(--text-primary);
+        }
+
+        .modal-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+            font-size: 0.825rem;
+            font-weight: 500;
+            color: var(--text-tertiary);
+            cursor: pointer;
+            border: none;
+            background: none;
+            padding: 0;
+            margin-bottom: 1.5rem;
+            transition: color 0.2s ease;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .modal-back:hover { color: var(--text-primary); }
+
+        /* ── About Modal ───────────────────────── */
+
+        .about-header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .about-photo {
+            width: 96px;
+            height: 96px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 1rem;
+            border: 3px solid var(--bg-warm);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .about-name {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 1.375rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+        }
+
+        .about-details {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+            margin-bottom: 1rem;
+        }
+
+        .about-details a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.2s ease;
+        }
+
+        .about-details a:hover { color: var(--accent); }
+
+        .about-details i {
+            width: 16px;
+            text-align: center;
+            margin-right: 6px;
+            font-size: 0.8rem;
+        }
+
+        .about-mission {
+            font-style: italic;
+            color: var(--text-secondary);
+            font-size: 0.925rem;
+            line-height: 1.7;
+            text-align: center;
+            padding: 1.25rem 0;
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 1.25rem;
+        }
+
+        .about-cta {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--accent);
             text-decoration: none;
             cursor: pointer;
+            transition: gap 0.2s ease;
         }
-        @media (max-width: 1023px) {
-            .desktop-only {
-                display: none;
-            }
-            .header-content {
-                display: none;
-            }
+
+        .about-cta:hover { gap: 0.75rem; }
+
+        .about-cta .arrow {
+            display: inline-block;
+            transition: transform 0.2s ease;
         }
-        @media (min-width: 1024px) {
-            .mobile-only {
-                display: none;
-            }
+
+        .about-cta:hover .arrow { transform: translateX(2px); }
+
+        /* ── Agent Cards ───────────────────────── */
+
+        .agents-title {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 1.25rem;
+            text-align: center;
+            margin-bottom: 1.25rem;
         }
+
+        .agents-grid {
+            display: grid;
+            gap: 0.75rem;
+        }
+
+        .agent-card {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.875rem 1rem;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border);
+            cursor: pointer;
+            transition: border-color 0.2s ease,
+                        box-shadow 0.2s ease,
+                        transform 0.15s ease;
+        }
+
+        .agent-card:hover {
+            border-color: var(--accent);
+            box-shadow: var(--shadow-sm);
+            transform: translateY(-1px);
+        }
+
+        .agent-card-photo {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+
+        .agent-card-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .agent-card-name {
+            font-weight: 600;
+            font-size: 0.925rem;
+            color: var(--text-primary);
+            margin-bottom: 0.125rem;
+        }
+
+        .agent-card-phone {
+            font-size: 0.825rem;
+            color: var(--text-secondary);
+        }
+
+        .agent-card-arrow {
+            color: var(--text-tertiary);
+            font-size: 0.75rem;
+            transition: color 0.2s ease, transform 0.2s ease;
+        }
+
+        .agent-card:hover .agent-card-arrow {
+            color: var(--accent);
+            transform: translateX(2px);
+        }
+
+        /* ── Agent Detail ──────────────────────── */
+
+        .agent-detail { text-align: center; }
+
+        .agent-detail-photo {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 1.25rem;
+            border: 3px solid var(--bg-warm);
+            box-shadow: var(--shadow-md);
+        }
+
+        .agent-detail-name {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 1.375rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .agent-detail-contact {
+            display: flex;
+            justify-content: center;
+            gap: 0.75rem;
+            margin-bottom: 1.25rem;
+            flex-wrap: wrap;
+        }
+
+        .agent-contact-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+            padding: 0.5rem 1rem;
+            border-radius: 100px;
+            border: 1px solid var(--border);
+            background: var(--bg-primary);
+            color: var(--text-secondary);
+            font-size: 0.825rem;
+            font-weight: 500;
+            text-decoration: none;
+            transition: border-color 0.2s ease,
+                        color 0.2s ease;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .agent-contact-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .agent-detail-bio {
+            font-size: 0.925rem;
+            line-height: 1.7;
+            color: var(--text-secondary);
+            padding-top: 1.25rem;
+            border-top: 1px solid var(--border);
+        }
+
+        /* ── Responsive ────────────────────────── */
+
         @media (max-width: 640px) {
-            #agentsList > div {
-                margin-bottom: 0.25rem;
+            .modal-backdrop { padding-top: 60px; }
+            .modal-panel {
+                margin: 0.75rem auto;
+                padding: 1.5rem;
+                border-radius: var(--radius-md);
             }
+            .about-header { padding-right: 1.5rem; }
         }
     </style>
 </head>
-<body class="flex flex-col h-screen">
-    <header class="bg-white shadow-md p-4 flex items-center justify-between relative">
-        <div class="w-full flex justify-center lg:justify-start">
-            <a href="/">
-                <img src="{{LOGO_FILE}}" alt="{{COMPANY_NAME}}" class="h-12">
+<body>
+    <header class="site-header">
+        <a href="/" class="header-logo">
+            <img src="{{LOGO_FILE}}" alt="{{COMPANY_NAME}}">
+        </a>
+        <div class="header-contact">
+            <a href="mailto:{{COMPANY_EMAIL}}">{{COMPANY_EMAIL}}</a>
+            <span class="dot"></span>
+            <a href="tel:+{{COMPANY_PHONE_RAW}}">{{COMPANY_PHONE}}</a>
+        </div>
+        <div style="display: flex; align-items: center; gap: 0.25rem;">
+            <a href="tel:+{{COMPANY_PHONE_RAW}}" class="header-btn mobile-call" aria-label="Call us">
+                <i class="fas fa-phone"></i>
             </a>
+            <button id="menuBtn" class="header-btn" aria-label="Menu">
+                <i class="fas fa-bars"></i>
+            </button>
         </div>
-        <div class="absolute left-1/2 transform -translate-x-1/2 text-center header-content">
-            <div class="bg-gray-100 rounded-full px-4 py-2 shadow-sm">
-                <a href="mailto:{{COMPANY_EMAIL}}" class="playfair text-gray-700 hover:text-blue-600 transition duration-300">{{COMPANY_EMAIL}}</a>
-                <span class="mx-2 text-gray-400">&bull;</span>
-                <a href="tel:+{{COMPANY_PHONE_RAW}}" class="playfair text-gray-700 hover:text-blue-600 transition duration-300">{{COMPANY_PHONE}}</a>
-            </div>
-        </div>
-        <button id="menuBtn" class="absolute right-4 top-1/2 transform -translate-y-1/2 text-2xl">
-            <i class="fas fa-bars"></i>
-        </button>
     </header>
 
-    <main class="flex-grow">
-        <div class="iframe-container">
-            <div id="loadingOverlay" class="loading-overlay">
-                <div class="loading-content">
-                    <img src="{{LOGO_FILE}}" alt="{{COMPANY_NAME}}" class="loading-logo">
-                    <div class="loading-spinner"></div>
-                    <div class="loading-text playfair">Loading Property Listings...</div>
-                    <div class="loading-subtext">Connecting to MLS database</div>
+    <main class="main-content">
+        <div id="loadingOverlay" class="loading-overlay">
+            <div class="loading-content">
+                <img src="{{LOGO_FILE}}" alt="{{COMPANY_NAME}}" class="loading-logo">
+                <div class="loading-bar-track">
+                    <div class="loading-bar-fill"></div>
                 </div>
+                <div class="loading-text playfair">Loading Property Listings</div>
+                <div class="loading-subtext">Connecting to MLS database</div>
             </div>
-            <iframe id="mlsFrame"
-                    src="https://my.flexmls.com/{{FLEXMLS_ID}}/search/listing_categories/Active/listings"
-                    class="w-full h-full iframe-hidden"
-                    onload="handleIframeLoad()"></iframe>
         </div>
+        <iframe id="mlsFrame"
+                src="https://my.flexmls.com/{{FLEXMLS_ID}}/search/listing_categories/Active/listings"
+                class="iframe-hidden"
+                onload="handleIframeLoad()"></iframe>
     </main>
 
-    <div id="aboutModal" class="modal">
-        <div class="modal-content rounded-lg p-4 md:p-8">
-            <span class="close">&times;</span>
-            <div class="flex flex-col md:flex-row justify-center items-center mb-4">
-                <img src="{{COMPANY_PHOTO_FILE}}" alt="{{COMPANY_NAME}}" class="w-32 h-32 md:mr-4 mb-4 md:mb-0 rounded-full">
-                <div class="text-center md:text-left">
-                    <h2 class="playfair text-lg mb-2">{{COMPANY_NAME}}</h2>
-                    <p class="mb-1">
-                        <a href="https://www.google.com/maps/search/?api=1&query={{COMPANY_ADDRESS_QUERY}}"
-                           target="_blank" class="text-blue-600 hover:underline transition duration-300">
-                            {{COMPANY_ADDRESS}}
-                        </a>
-                    </p>
-                    <p class="mb-1">
-                        <a href="mailto:{{COMPANY_EMAIL}}" class="text-blue-600 hover:underline transition duration-300">
-                            {{COMPANY_EMAIL}}
-                        </a>
-                    </p>
-                    <p class="mb-2">
-                        <a href="tel:{{COMPANY_PHONE_RAW}}" class="text-blue-600 hover:underline transition duration-300">
-                            {{COMPANY_PHONE}}
-                        </a>
-                    </p>
+    <!-- About Modal -->
+    <div id="aboutModal" class="modal-backdrop">
+        <div class="modal-panel">
+            <button class="modal-close" aria-label="Close">&times;</button>
+            <div class="about-header">
+                <img src="{{COMPANY_PHOTO_FILE}}" alt="{{COMPANY_NAME}}" class="about-photo">
+                <h2 class="about-name">{{COMPANY_NAME}}</h2>
+                <div class="about-details">
+                    <a href="https://www.google.com/maps/search/?api=1&query={{COMPANY_ADDRESS_QUERY}}" target="_blank">
+                        <i class="fas fa-map-marker-alt"></i>{{COMPANY_ADDRESS}}
+                    </a>
+                    <a href="mailto:{{COMPANY_EMAIL}}">
+                        <i class="fas fa-envelope"></i>{{COMPANY_EMAIL}}
+                    </a>
+                    <a href="tel:+{{COMPANY_PHONE_RAW}}">
+                        <i class="fas fa-phone"></i>{{COMPANY_PHONE}}
+                    </a>
                 </div>
             </div>
-            <p class="text-center italic mb-2">
-                {{COMPANY_MISSION}}
-            </p>
-            <p class="text-center">
-                <a href="#" id="meetAgentsBtn" class="text-blue-600 hover:underline transition duration-300">Meet Our Agents</a>
-            </p>
+            <p class="about-mission">{{COMPANY_MISSION}}</p>
+            <div style="text-align: center;">
+                <a id="meetAgentsBtn" class="about-cta">
+                    Meet Our Agents <span class="arrow">&rarr;</span>
+                </a>
+            </div>
         </div>
     </div>
 
-    <div id="agentsModal" class="modal">
-        <div class="modal-content rounded-lg">
-            <span class="close">&times;</span>
-            <div class="flex items-center justify-center mb-4">
-                <h2 class="playfair text-lg">Our Agents</h2>
-            </div>
-            <div id="agentsList" class="space-y-4"></div>
+    <!-- Agents Modal -->
+    <div id="agentsModal" class="modal-backdrop">
+        <div class="modal-panel">
+            <button class="modal-close" aria-label="Close">&times;</button>
+            <button class="modal-back" id="agentsBackBtn">
+                <i class="fas fa-chevron-left"></i> Back
+            </button>
+            <h2 class="agents-title">Our Agents</h2>
+            <div id="agentsList" class="agents-grid"></div>
         </div>
     </div>
 
-    <div id="agentDetailModal" class="modal">
-        <div class="modal-content rounded-lg">
-            <span class="close">&times;</span>
-            <div id="agentDetail" class="flex flex-col items-center">
-                <!-- Agent details will be inserted here -->
-            </div>
+    <!-- Agent Detail Modal -->
+    <div id="agentDetailModal" class="modal-backdrop">
+        <div class="modal-panel">
+            <button class="modal-close" aria-label="Close">&times;</button>
+            <button class="modal-back" id="detailBackBtn">
+                <i class="fas fa-chevron-left"></i> All Agents
+            </button>
+            <div id="agentDetail" class="agent-detail"></div>
         </div>
     </div>
 
     <script>
+        // ── Elements ──
         const menuBtn = document.getElementById('menuBtn');
         const aboutModal = document.getElementById('aboutModal');
         const agentsModal = document.getElementById('agentsModal');
         const agentDetailModal = document.getElementById('agentDetailModal');
         const meetAgentsBtn = document.getElementById('meetAgentsBtn');
-        const closeBtns = document.getElementsByClassName('close');
+        const agentsBackBtn = document.getElementById('agentsBackBtn');
+        const detailBackBtn = document.getElementById('detailBackBtn');
         const agentsList = document.getElementById('agentsList');
         const agentDetail = document.getElementById('agentDetail');
 
-        // Loading overlay handling
-        let loadingMessages = [
-            { text: "Loading Property Listings...", subtext: "Connecting to MLS database" },
-            { text: "Fetching Active Listings...", subtext: "Retrieving latest properties" },
-            { text: "Preparing Your Results...", subtext: "Almost ready" }
+        // ── Modal helpers ──
+        function openModal(modal) {
+            modal.style.display = 'block';
+            modal.offsetHeight; // force reflow
+            modal.classList.add('active');
+        }
+
+        function closeModal(modal) {
+            modal.classList.remove('active');
+            setTimeout(function() { modal.style.display = 'none'; }, 350);
+        }
+
+        function closeAllModals() {
+            [aboutModal, agentsModal, agentDetailModal].forEach(closeModal);
+        }
+
+        // ── Loading ──
+        var loadingMessages = [
+            { text: "Loading Property Listings", subtext: "Connecting to MLS database" },
+            { text: "Fetching Active Listings", subtext: "Retrieving latest properties" },
+            { text: "Preparing Your Results", subtext: "Almost ready" }
         ];
-        let messageIndex = 0;
-        let messageInterval;
+        var messageIndex = 0;
+        var messageInterval;
 
         function updateLoadingMessage() {
             messageIndex = (messageIndex + 1) % loadingMessages.length;
-            const message = loadingMessages[messageIndex];
-            const textEl = document.querySelector('.loading-text');
-            const subtextEl = document.querySelector('.loading-subtext');
+            var msg = loadingMessages[messageIndex];
+            var textEl = document.querySelector('.loading-text');
+            var subtextEl = document.querySelector('.loading-subtext');
             if (textEl && subtextEl) {
-                textEl.textContent = message.text;
-                subtextEl.textContent = message.subtext;
+                textEl.style.opacity = '0';
+                subtextEl.style.opacity = '0';
+                setTimeout(function() {
+                    textEl.textContent = msg.text;
+                    subtextEl.textContent = msg.subtext;
+                    textEl.style.opacity = '1';
+                    subtextEl.style.opacity = '1';
+                }, 250);
             }
         }
 
         function handleIframeLoad() {
-            const overlay = document.getElementById('loadingOverlay');
-            const iframe = document.getElementById('mlsFrame');
+            var overlay = document.getElementById('loadingOverlay');
+            var iframe = document.getElementById('mlsFrame');
+            if (messageInterval) clearInterval(messageInterval);
 
-            // Clear the message rotation
-            if (messageInterval) {
-                clearInterval(messageInterval);
+            // Complete the progress bar
+            var fill = document.querySelector('.loading-bar-fill');
+            if (fill) {
+                fill.style.transition = 'width 0.4s ease';
+                fill.style.width = '100%';
             }
 
-            // Fade out the loading overlay
-            overlay.classList.add('fade-out');
-
-            // Show the iframe after fade animation
-            setTimeout(() => {
-                iframe.classList.remove('iframe-hidden');
-                overlay.style.display = 'none';
-            }, 300);
+            setTimeout(function() {
+                overlay.classList.add('fade-out');
+                setTimeout(function() {
+                    iframe.classList.remove('iframe-hidden');
+                    overlay.style.display = 'none';
+                }, 600);
+            }, 400);
         }
 
-        // Start rotating messages after a short delay
-        setTimeout(() => {
+        // Start rotating messages
+        setTimeout(function() {
             messageInterval = setInterval(updateLoadingMessage, 2500);
         }, 1500);
 
-        // Fallback: Remove loading after max time (in case onload doesn't fire)
-        setTimeout(() => {
-            const iframe = document.getElementById('mlsFrame');
+        // Fallback: force-show iframe after 15s
+        setTimeout(function() {
+            var iframe = document.getElementById('mlsFrame');
             if (iframe && iframe.classList.contains('iframe-hidden')) {
                 handleIframeLoad();
             }
-        }, 15000); // 15 second max wait
+        }, 15000);
 
-        menuBtn.onclick = function() {
-            aboutModal.style.display = "block";
-        }
+        // ── Menu & navigation ──
+        menuBtn.onclick = function() { openModal(aboutModal); };
 
-        meetAgentsBtn.onclick = function() {
-            aboutModal.style.display = "none";
-            agentsModal.style.display = "block";
-        }
+        meetAgentsBtn.onclick = function(e) {
+            e.preventDefault();
+            closeModal(aboutModal);
+            setTimeout(function() { openModal(agentsModal); }, 350);
+        };
 
-        for (let closeBtn of closeBtns) {
-            closeBtn.onclick = function() {
-                aboutModal.style.display = "none";
-                agentsModal.style.display = "none";
-                agentDetailModal.style.display = "none";
-            }
-        }
+        agentsBackBtn.onclick = function() {
+            closeModal(agentsModal);
+            setTimeout(function() { openModal(aboutModal); }, 350);
+        };
 
-        window.onclick = function(event) {
-            if (event.target == aboutModal) {
-                aboutModal.style.display = "none";
-            }
-            if (event.target == agentsModal) {
-                agentsModal.style.display = "none";
-            }
-            if (event.target == agentDetailModal) {
-                agentDetailModal.style.display = "none";
-            }
-        }
+        detailBackBtn.onclick = function() {
+            closeModal(agentDetailModal);
+            setTimeout(function() { openModal(agentsModal); }, 350);
+        };
 
+        // Close buttons
+        document.querySelectorAll('.modal-close').forEach(function(btn) {
+            btn.onclick = closeAllModals;
+        });
+
+        // Click backdrop to close
+        [aboutModal, agentsModal, agentDetailModal].forEach(function(modal) {
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) closeAllModals();
+            });
+        });
+
+        // Escape key closes modals
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeAllModals();
+        });
+
+        // ── Agents ──
         {{AGENTS_DATA_ARRAY}}
 
+        // Hide "Meet Our Agents" if none exist
+        if (!agentsData || agentsData.length === 0) {
+            meetAgentsBtn.style.display = 'none';
+        }
+
         function createAgentElement(agent) {
-            const agentDiv = document.createElement('div');
-            agentDiv.className = 'flex flex-wrap justify-between items-center';
-
-            const nameElement = document.createElement('div');
-            nameElement.className = 'w-3/5 cursor-pointer text-blue-600 hover:underline transition duration-300 whitespace-nowrap';
-            nameElement.textContent = agent.name;
-            nameElement.onclick = function() {
-                showAgentDetails(agent);
-            };
-
-            agentDiv.innerHTML = `
-                <div class="w-3/5"></div>
-                <div class="w-2/5 text-right">
-                    <a href="tel:${agent.phone.replace(/\D/g,'')}" class="text-blue-600 hover:underline transition duration-300">${agent.phone}</a>
-                </div>
-            `;
-            agentDiv.firstElementChild.appendChild(nameElement);
-
-            return agentDiv;
+            var card = document.createElement('div');
+            card.className = 'agent-card';
+            card.onclick = function() { showAgentDetails(agent); };
+            card.innerHTML =
+                '<img loading="lazy" src="' + agent.image + '" alt="' + agent.name + '" class="agent-card-photo">' +
+                '<div class="agent-card-info">' +
+                    '<div class="agent-card-name">' + agent.name + '</div>' +
+                    '<div class="agent-card-phone">' + agent.phone + '</div>' +
+                '</div>' +
+                '<i class="fas fa-chevron-right agent-card-arrow"></i>';
+            return card;
         }
 
         function showAgentDetails(agent) {
-            agentDetail.innerHTML = `
-                <img loading="lazy" src="${agent.image}" alt="${agent.name}" class="w-32 h-32 rounded-full mb-4">
-                <h2 class="text-xl font-bold mb-2">${agent.name}</h2>
-                <p class="mb-2"><a href="mailto:${agent.email}" class="text-blue-600 hover:underline transition duration-300">${agent.email}</a></p>
-                <p class="mb-4"><a href="tel:${agent.phone.replace(/\D/g,'')}" class="text-blue-600 hover:underline transition duration-300">${agent.phone}</a></p>
-                <p class="text-sm">${agent.bio}</p>
-            `;
-            agentDetailModal.style.display = "block";
+            var phoneRaw = agent.phone.replace(/\D/g, '');
+            agentDetail.innerHTML =
+                '<img loading="lazy" src="' + agent.image + '" alt="' + agent.name + '" class="agent-detail-photo">' +
+                '<h2 class="agent-detail-name">' + agent.name + '</h2>' +
+                '<div class="agent-detail-contact">' +
+                    '<a href="mailto:' + agent.email + '" class="agent-contact-btn">' +
+                        '<i class="fas fa-envelope"></i> ' + agent.email +
+                    '</a>' +
+                    '<a href="tel:' + phoneRaw + '" class="agent-contact-btn">' +
+                        '<i class="fas fa-phone"></i> ' + agent.phone +
+                    '</a>' +
+                '</div>' +
+                '<p class="agent-detail-bio">' + agent.bio + '</p>';
+            closeModal(agentsModal);
+            setTimeout(function() { openModal(agentDetailModal); }, 350);
         }
 
         function displayAgents() {
-            agentsList.innerHTML = ''; // Clear existing agents
-            agentsData.forEach(agent => {
+            agentsList.innerHTML = '';
+            agentsData.forEach(function(agent) {
                 agentsList.appendChild(createAgentElement(agent));
             });
         }
 
-        displayAgents(); // Initial display
-
-        // Update display on window resize
-        window.addEventListener('resize', displayAgents);
+        displayAgents();
     </script>
 </body>
 </html>

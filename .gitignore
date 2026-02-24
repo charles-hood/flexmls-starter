@@ -1,3 +1,6 @@
 my-realtor-site/
+sample-site/
 output/
+.venv/
+generate_sample_assets.py
 .DS_Store
