@@ -1,0 +1,202 @@
+# FlexMLS Starter
+
+Generate a complete real estate website in seconds. No build tools, no frameworks, no API licensing — just static files that work in any browser and deploy anywhere.
+
+Built on the same architecture as [Elite Realtors LLC](https://elite.rockofpages.com) — a proven "thin wrapper around FlexMLS" that costs nothing to maintain.
+
+## What You Get
+
+A single-page site with:
+
+- **Full-screen FlexMLS listings** — property search loads immediately, no clicks required
+- **Branded loading screen** — logo, spinner, rotating status messages while iframe loads
+- **Hamburger menu** — company info, address (links to Google Maps), email, phone
+- **Agent directory** — clickable list with detail modals showing photo, bio, contact info
+- **PWA support** — installable on mobile devices
+- **OG meta tags** — proper social media previews when shared
+- **Responsive** — works on all screen sizes
+
+## Quick Start
+
+```bash
+git clone https://github.com/charles-hood/flexmls-starter.git
+cd flexmls-starter
+chmod +x generate.sh
+./generate.sh
+```
+
+The script asks for your company info, FlexMLS ID, and optionally your agents. It generates a ready-to-deploy site.
+
+## What You Need
+
+- **A FlexMLS account** — your FlexMLS ID is in your dashboard URL: `my.flexmls.com/YourIDHere/search/...`
+- **bash** and **python3** — pre-installed on macOS and most Linux systems
+- **Your company info** — name, phone, email, address
+- **Images** (optional) — logo, social preview image, company photo, agent headshots
+
+## Project Structure
+
+```
+flexmls-starter/
+├── generate.sh                    # Interactive setup script
+├── README.md                      # This file
+├── template/
+│   ├── index.html                 # Site template with {{PLACEHOLDERS}}
+│   ├── manifest.json              # PWA manifest template
+│   └── property-redirect.html     # Individual listing redirect template
+├── defaults/
+│   ├── favicon.png                # Default favicon
+│   ├── icon-192x192.png           # PWA icon
+│   ├── icon-512x512.png           # PWA icon
+│   └── placeholder-agent.jpg      # Fallback headshot
+└── examples/
+    └── agents.csv                 # Example CSV for bulk agent import
+```
+
+## Generated Output
+
+```
+my-realtor-site/
+├── index.html           # Complete, ready-to-deploy
+├── manifest.json        # PWA manifest
+├── favicon.png          # Browser favicon
+├── icon-192x192.png     # PWA icons
+├── icon-512x512.png
+├── logo.jpg             # Company logo
+├── og-image.jpg         # Social media image
+├── company-photo.jpg    # About modal image
+└── agents/              # Agent headshots
+    ├── janesmith.jpg
+    └── johndoe.jpg
+```
+
+Open `index.html` in a browser — it just works.
+
+## Adding Agents
+
+### Option 1: Interactive (during generation)
+
+The script prompts you for each agent's name, email, phone, bio, and headshot photo.
+
+### Option 2: CSV import (during generation)
+
+Prepare a CSV file:
+
+```csv
+name,email,phone,bio,photo
+"Jane Smith","jane@example.com","423-555-0100","Jane has 10 years of experience...","/path/to/jane.jpg"
+"John Doe","john@example.com","423-555-0200","John specializes in...","/path/to/john.jpg"
+```
+
+### Option 3: Edit directly (after generation)
+
+Open `index.html` and find the `agentsData` array. Add entries:
+
+```javascript
+const agentsData = [
+    {
+        name: "Jane Smith",
+        email: "jane@example.com",
+        phone: "423-555-0100",
+        image: "agents/janesmith.jpg",
+        bio: "Jane has 10 years of experience..."
+    }
+];
+```
+
+## Deployment
+
+### Any static host
+
+Upload the generated folder contents to your web server. That's it.
+
+### Caddy (recommended)
+
+```caddy
+yourdomain.com, www.yourdomain.com {
+    root * /var/www/your-site
+    file_server
+    encode gzip
+
+    @static {
+        file
+        path *.css *.js *.jpg *.jpeg *.png *.gif *.svg *.woff *.woff2 *.ico
+    }
+    header @static Cache-Control "public, max-age=31536000, immutable"
+
+    @html {
+        file
+        path *.html
+    }
+    header @html Cache-Control "public, max-age=3600"
+
+    header ?Cache-Control "public, max-age=3600"
+
+    try_files {path} {path}/ /index.html
+}
+```
+
+### Nginx
+
+```nginx
+server {
+    listen 80;
+    server_name yourdomain.com;
+    root /var/www/your-site;
+    index index.html;
+
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+
+    location ~* \.(css|js|jpg|jpeg|png|gif|svg|woff|woff2|ico)$ {
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+    }
+}
+```
+
+## Property Listing Redirects
+
+To create a short URL for a specific listing (e.g., for yard signs or flyers):
+
+1. Copy `template/property-redirect.html` to your site as `123-main-st.html`
+2. Replace `{{FLEXMLS_LISTING_URL}}` with the actual FlexMLS listing URL
+3. Replace `{{LOGO_FILE}}` with your logo filename
+4. Replace `{{COMPANY_NAME}}` with your company name
+
+Visitors to `yourdomain.com/123-main-st.html` see your logo for 2 seconds, then get redirected to the listing.
+
+## Customization After Generation
+
+Everything is plain HTML/CSS/JS — edit anything directly:
+
+- **Colors**: Search for your accent color hex code in `index.html`
+- **Fonts**: The site uses Playfair Display (headings) via Google Fonts CDN
+- **Layout**: Tailwind CSS classes throughout, loaded from CDN
+- **Icons**: Font Awesome loaded from CDN
+- **Loading messages**: Edit the `loadingMessages` array in the `<script>` block
+
+## Technology Stack
+
+- **Tailwind CSS** (CDN) — responsive utility classes
+- **Google Fonts** — Playfair Display for headings
+- **Font Awesome** (CDN) — icons
+- **FlexMLS iframe** — real-time MLS listings, zero maintenance
+- **Vanilla JavaScript** — no framework dependencies
+
+Zero build tools. Zero npm packages. Zero maintenance burden.
+
+## Why This Architecture
+
+Real estate sites don't need to be complicated. Users want:
+
+1. **Listings** — the FlexMLS iframe handles this
+2. **Contact info** — phone number in the header
+3. **Agent info** — in the hamburger menu
+
+This template delivers exactly that. Nothing more, nothing less.
+
+## License
+
+MIT

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redirecting...</title>
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f8f9fa;
+        }
+        .splash-container {
+            text-align: center;
+        }
+        .splash-container img {
+            max-width: 40%;
+            height: auto;
+        }
+    </style>
+    <script>
+        function redirect() {
+            setTimeout(function() {
+                // Replace with the actual FlexMLS listing URL
+                window.location.href = "{{FLEXMLS_LISTING_URL}}";
+            }, 2000);
+        }
+        window.onload = redirect;
+    </script>
+</head>
+<body>
+    <div class="splash-container">
+        <img src="{{LOGO_FILE}}" alt="{{COMPANY_NAME}}">
+        <p>Redirecting, please wait...</p>
+    </div>
+</body>
+</html>

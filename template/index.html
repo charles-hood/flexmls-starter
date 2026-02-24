@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{COMPANY_NAME}} - Real Estate Services in {{COMPANY_CITY}}, {{COMPANY_STATE}}</title>
+    <meta name="description" content="{{COMPANY_NAME}} provides top-notch real estate services in {{COMPANY_CITY}}, {{COMPANY_STATE}}. Our agents work tirelessly to help you achieve your dreams of buying or selling property.">
+    <meta name="keywords" content="{{COMPANY_NAME}}, real estate, {{COMPANY_CITY}}, {{COMPANY_STATE}}, buy property, sell property">
+    <meta name="author" content="{{COMPANY_NAME}}">
+
+    <!-- Full-screen mode on mobile devices -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <!-- Link to the manifest file -->
+    <link rel="manifest" href="/manifest.json">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="/favicon.png">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://{{COMPANY_DOMAIN}}/">
+    <meta property="og:title" content="{{COMPANY_NAME}} - Real Estate Services in {{COMPANY_CITY}}, {{COMPANY_STATE}}">
+    <meta property="og:description" content="{{COMPANY_MISSION}}">
+    <meta property="og:image" content="https://{{COMPANY_DOMAIN}}/{{OG_IMAGE_FILE}}">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://{{COMPANY_DOMAIN}}/">
+    <meta property="twitter:title" content="{{COMPANY_NAME}} - Real Estate Services in {{COMPANY_CITY}}, {{COMPANY_STATE}}">
+    <meta property="twitter:description" content="{{COMPANY_MISSION}}">
+    <meta property="twitter:image" content="https://{{COMPANY_DOMAIN}}/{{OG_IMAGE_FILE}}">
+
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        .playfair {
+            font-family: 'Playfair Display', serif;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 72px;
+            width: 100%;
+            height: calc(100% - 72px);
+            overflow: auto;
+            background-color: rgba(0,0,0,0.5);
+        }
+        .iframe-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #f5f5f5 0%, #ffffff 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            transition: opacity 0.3s ease-out;
+        }
+        .loading-overlay.fade-out {
+            opacity: 0;
+            pointer-events: none;
+        }
+        .loading-content {
+            text-align: center;
+        }
+        .loading-logo {
+            width: 200px;
+            height: auto;
+            margin-bottom: 2rem;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            margin: 0 auto 1rem auto;
+            border: 3px solid #e0e0e0;
+            border-top: 3px solid {{ACCENT_COLOR}};
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .loading-text {
+            color: #333;
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+        .loading-subtext {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        .iframe-hidden {
+            visibility: hidden;
+            position: absolute;
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 90%;
+            max-width: 800px;
+            max-height: calc(100vh - 92px);
+            overflow-y: auto;
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        @media (max-width: 1023px) {
+            .desktop-only {
+                display: none;
+            }
+            .header-content {
+                display: none;
+            }
+        }
+        @media (min-width: 1024px) {
+            .mobile-only {
+                display: none;
+            }
+        }
+        @media (max-width: 640px) {
+            #agentsList > div {
+                margin-bottom: 0.25rem;
+            }
+        }
+    </style>
+</head>
+<body class="flex flex-col h-screen">
+    <header class="bg-white shadow-md p-4 flex items-center justify-between relative">
+        <div class="w-full flex justify-center lg:justify-start">
+            <a href="/">
+                <img src="{{LOGO_FILE}}" alt="{{COMPANY_NAME}}" class="h-12">
+            </a>
+        </div>
+        <div class="absolute left-1/2 transform -translate-x-1/2 text-center header-content">
+            <div class="bg-gray-100 rounded-full px-4 py-2 shadow-sm">
+                <a href="mailto:{{COMPANY_EMAIL}}" class="playfair text-gray-700 hover:text-blue-600 transition duration-300">{{COMPANY_EMAIL}}</a>
+                <span class="mx-2 text-gray-400">&bull;</span>
+                <a href="tel:+{{COMPANY_PHONE_RAW}}" class="playfair text-gray-700 hover:text-blue-600 transition duration-300">{{COMPANY_PHONE}}</a>
+            </div>
+        </div>
+        <button id="menuBtn" class="absolute right-4 top-1/2 transform -translate-y-1/2 text-2xl">
+            <i class="fas fa-bars"></i>
+        </button>
+    </header>
+
+    <main class="flex-grow">
+        <div class="iframe-container">
+            <div id="loadingOverlay" class="loading-overlay">
+                <div class="loading-content">
+                    <img src="{{LOGO_FILE}}" alt="{{COMPANY_NAME}}" class="loading-logo">
+                    <div class="loading-spinner"></div>
+                    <div class="loading-text playfair">Loading Property Listings...</div>
+                    <div class="loading-subtext">Connecting to MLS database</div>
+                </div>
+            </div>
+            <iframe id="mlsFrame"
+                    src="https://my.flexmls.com/{{FLEXMLS_ID}}/search/listing_categories/Active/listings"
+                    class="w-full h-full iframe-hidden"
+                    onload="handleIframeLoad()"></iframe>
+        </div>
+    </main>
+
+    <div id="aboutModal" class="modal">
+        <div class="modal-content rounded-lg p-4 md:p-8">
+            <span class="close">&times;</span>
+            <div class="flex flex-col md:flex-row justify-center items-center mb-4">
+                <img src="{{COMPANY_PHOTO_FILE}}" alt="{{COMPANY_NAME}}" class="w-32 h-32 md:mr-4 mb-4 md:mb-0 rounded-full">
+                <div class="text-center md:text-left">
+                    <h2 class="playfair text-lg mb-2">{{COMPANY_NAME}}</h2>
+                    <p class="mb-1">
+                        <a href="https://www.google.com/maps/search/?api=1&query={{COMPANY_ADDRESS_QUERY}}"
+                           target="_blank" class="text-blue-600 hover:underline transition duration-300">
+                            {{COMPANY_ADDRESS}}
+                        </a>
+                    </p>
+                    <p class="mb-1">
+                        <a href="mailto:{{COMPANY_EMAIL}}" class="text-blue-600 hover:underline transition duration-300">
+                            {{COMPANY_EMAIL}}
+                        </a>
+                    </p>
+                    <p class="mb-2">
+                        <a href="tel:{{COMPANY_PHONE_RAW}}" class="text-blue-600 hover:underline transition duration-300">
+                            {{COMPANY_PHONE}}
+                        </a>
+                    </p>
+                </div>
+            </div>
+            <p class="text-center italic mb-2">
+                {{COMPANY_MISSION}}
+            </p>
+            <p class="text-center">
+                <a href="#" id="meetAgentsBtn" class="text-blue-600 hover:underline transition duration-300">Meet Our Agents</a>
+            </p>
+        </div>
+    </div>
+
+    <div id="agentsModal" class="modal">
+        <div class="modal-content rounded-lg">
+            <span class="close">&times;</span>
+            <div class="flex items-center justify-center mb-4">
+                <h2 class="playfair text-lg">Our Agents</h2>
+            </div>
+            <div id="agentsList" class="space-y-4"></div>
+        </div>
+    </div>
+
+    <div id="agentDetailModal" class="modal">
+        <div class="modal-content rounded-lg">
+            <span class="close">&times;</span>
+            <div id="agentDetail" class="flex flex-col items-center">
+                <!-- Agent details will be inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const menuBtn = document.getElementById('menuBtn');
+        const aboutModal = document.getElementById('aboutModal');
+        const agentsModal = document.getElementById('agentsModal');
+        const agentDetailModal = document.getElementById('agentDetailModal');
+        const meetAgentsBtn = document.getElementById('meetAgentsBtn');
+        const closeBtns = document.getElementsByClassName('close');
+        const agentsList = document.getElementById('agentsList');
+        const agentDetail = document.getElementById('agentDetail');
+
+        // Loading overlay handling
+        let loadingMessages = [
+            { text: "Loading Property Listings...", subtext: "Connecting to MLS database" },
+            { text: "Fetching Active Listings...", subtext: "Retrieving latest properties" },
+            { text: "Preparing Your Results...", subtext: "Almost ready" }
+        ];
+        let messageIndex = 0;
+        let messageInterval;
+
+        function updateLoadingMessage() {
+            messageIndex = (messageIndex + 1) % loadingMessages.length;
+            const message = loadingMessages[messageIndex];
+            const textEl = document.querySelector('.loading-text');
+            const subtextEl = document.querySelector('.loading-subtext');
+            if (textEl && subtextEl) {
+                textEl.textContent = message.text;
+                subtextEl.textContent = message.subtext;
+            }
+        }
+
+        function handleIframeLoad() {
+            const overlay = document.getElementById('loadingOverlay');
+            const iframe = document.getElementById('mlsFrame');
+
+            // Clear the message rotation
+            if (messageInterval) {
+                clearInterval(messageInterval);
+            }
+
+            // Fade out the loading overlay
+            overlay.classList.add('fade-out');
+
+            // Show the iframe after fade animation
+            setTimeout(() => {
+                iframe.classList.remove('iframe-hidden');
+                overlay.style.display = 'none';
+            }, 300);
+        }
+
+        // Start rotating messages after a short delay
+        setTimeout(() => {
+            messageInterval = setInterval(updateLoadingMessage, 2500);
+        }, 1500);
+
+        // Fallback: Remove loading after max time (in case onload doesn't fire)
+        setTimeout(() => {
+            const iframe = document.getElementById('mlsFrame');
+            if (iframe && iframe.classList.contains('iframe-hidden')) {
+                handleIframeLoad();
+            }
+        }, 15000); // 15 second max wait
+
+        menuBtn.onclick = function() {
+            aboutModal.style.display = "block";
+        }
+
+        meetAgentsBtn.onclick = function() {
+            aboutModal.style.display = "none";
+            agentsModal.style.display = "block";
+        }
+
+        for (let closeBtn of closeBtns) {
+            closeBtn.onclick = function() {
+                aboutModal.style.display = "none";
+                agentsModal.style.display = "none";
+                agentDetailModal.style.display = "none";
+            }
+        }
+
+        window.onclick = function(event) {
+            if (event.target == aboutModal) {
+                aboutModal.style.display = "none";
+            }
+            if (event.target == agentsModal) {
+                agentsModal.style.display = "none";
+            }
+            if (event.target == agentDetailModal) {
+                agentDetailModal.style.display = "none";
+            }
+        }
+
+        {{AGENTS_DATA_ARRAY}}
+
+        function createAgentElement(agent) {
+            const agentDiv = document.createElement('div');
+            agentDiv.className = 'flex flex-wrap justify-between items-center';
+
+            const nameElement = document.createElement('div');
+            nameElement.className = 'w-3/5 cursor-pointer text-blue-600 hover:underline transition duration-300 whitespace-nowrap';
+            nameElement.textContent = agent.name;
+            nameElement.onclick = function() {
+                showAgentDetails(agent);
+            };
+
+            agentDiv.innerHTML = `
+                <div class="w-3/5"></div>
+                <div class="w-2/5 text-right">
+                    <a href="tel:${agent.phone.replace(/\D/g,'')}" class="text-blue-600 hover:underline transition duration-300">${agent.phone}</a>
+                </div>
+            `;
+            agentDiv.firstElementChild.appendChild(nameElement);
+
+            return agentDiv;
+        }
+
+        function showAgentDetails(agent) {
+            agentDetail.innerHTML = `
+                <img loading="lazy" src="${agent.image}" alt="${agent.name}" class="w-32 h-32 rounded-full mb-4">
+                <h2 class="text-xl font-bold mb-2">${agent.name}</h2>
+                <p class="mb-2"><a href="mailto:${agent.email}" class="text-blue-600 hover:underline transition duration-300">${agent.email}</a></p>
+                <p class="mb-4"><a href="tel:${agent.phone.replace(/\D/g,'')}" class="text-blue-600 hover:underline transition duration-300">${agent.phone}</a></p>
+                <p class="text-sm">${agent.bio}</p>
+            `;
+            agentDetailModal.style.display = "block";
+        }
+
+        function displayAgents() {
+            agentsList.innerHTML = ''; // Clear existing agents
+            agentsData.forEach(agent => {
+                agentsList.appendChild(createAgentElement(agent));
+            });
+        }
+
+        displayAgents(); // Initial display
+
+        // Update display on window resize
+        window.addEventListener('resize', displayAgents);
+    </script>
+</body>
+</html>

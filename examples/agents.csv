@@ -1,0 +1,3 @@
+name,email,phone,bio,photo
+"Jane Smith","jane@example.com","423-555-0100","Jane has 10 years of experience in residential real estate across the greater Chattanooga area. She specializes in first-time home buyers and relocations.","/path/to/jane.jpg"
+"John Doe","john@example.com","423-555-0200","John specializes in luxury properties and new construction. A lifelong Tennessee resident, he brings deep local knowledge to every transaction.","/path/to/john.jpg"
