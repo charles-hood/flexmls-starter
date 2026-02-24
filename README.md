@@ -11,7 +11,7 @@ See it in action: **[Live Demo](https://riverfront-realty-demo.rockofpages.com)*
 A single-page site with:
 
 - **Full-screen FlexMLS listings** — property search loads immediately, no clicks required
-- **Branded loading screen** — logo, spinner, rotating status messages while iframe loads
+- **Branded loading screen** — logo, progress bar, rotating status messages while iframe loads
 - **Hamburger menu** — company info, address (links to Google Maps), email, phone
 - **Agent directory** — clickable list with detail modals showing photo, bio, contact info
 - **PWA support** — installable on mobile devices
@@ -173,8 +173,8 @@ Visitors to `yourdomain.com/123-main-st.html` see your logo for 2 seconds, then 
 
 Everything is plain HTML/CSS/JS — edit anything directly:
 
-- **Colors**: Search for your accent color hex code in `index.html`
-- **Fonts**: The site uses Playfair Display (headings) via Google Fonts CDN
+- **Colors**: Search for your accent color hex code in `index.html`, or change the `--accent` CSS variable
+- **Fonts**: Playfair Display (headings) + Outfit (body) via Google Fonts CDN
 - **Layout**: Tailwind CSS classes throughout, loaded from CDN
 - **Icons**: Font Awesome loaded from CDN
 - **Loading messages**: Edit the `loadingMessages` array in the `<script>` block
@@ -182,7 +182,7 @@ Everything is plain HTML/CSS/JS — edit anything directly:
 ## Technology Stack
 
 - **Tailwind CSS** (CDN) — responsive utility classes
-- **Google Fonts** — Playfair Display for headings
+- **Google Fonts** — Playfair Display (headings) + Outfit (body)
 - **Font Awesome** (CDN) — icons
 - **FlexMLS iframe** — real-time MLS listings, zero maintenance
 - **Vanilla JavaScript** — no framework dependencies
