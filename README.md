@@ -2,6 +2,8 @@
 
 Generate a complete real estate website in seconds. No build tools, no frameworks, no API licensing — just static files that work in any browser and deploy anywhere.
 
+**This template is for brokerages whose MLS uses [FlexMLS](https://www.flexmls.com/) (by FBS/CoreLogic).** FlexMLS powers many regional MLS systems across the US, but not all. If your brokerage has a FlexMLS portal (URLs like `my.flexmls.com/YourBrokerage/...`), this is for you. If your MLS uses a different platform, this template won't work.
+
 Built on the same architecture as [Elite Realtors LLC](https://elite.rockofpages.com) — a proven "thin wrapper around FlexMLS" that costs nothing to maintain.
 
 ## What You Get
