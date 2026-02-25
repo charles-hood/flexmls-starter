@@ -175,15 +175,13 @@ Everything is plain HTML/CSS/JS — edit anything directly:
 
 - **Colors**: Search for your accent color hex code in `index.html`, or change the `--accent` CSS variable
 - **Fonts**: Playfair Display (headings) + Outfit (body) via Google Fonts CDN
-- **Layout**: Tailwind CSS classes throughout, loaded from CDN
-- **Icons**: Font Awesome loaded from CDN
+- **Icons**: Inline SVG sprite — no external icon library
 - **Loading messages**: Edit the `loadingMessages` array in the `<script>` block
 
 ## Technology Stack
 
-- **Tailwind CSS** (CDN) — responsive utility classes
-- **Google Fonts** — Playfair Display (headings) + Outfit (body)
-- **Font Awesome** (CDN) — icons
+- **Google Fonts** (CDN) — Playfair Display (headings) + Outfit (body)
+- **Inline SVG icons** — no external icon library
 - **FlexMLS iframe** — real-time MLS listings, zero maintenance
 - **Vanilla JavaScript** — no framework dependencies
 
