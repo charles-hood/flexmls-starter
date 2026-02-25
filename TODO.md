@@ -14,5 +14,5 @@
 
 ## Nice to have
 
-- [ ] **Favicon from logo** — `generate.sh` could auto-generate a favicon from the provided logo image using `sips` (macOS) or ImageMagick, instead of using the generic default
+- [x] **Favicon from logo** — `generate.sh` auto-generates a 48x48 favicon from the provided logo using `sips` (macOS) or ImageMagick, falling back to the default
 - [ ] **Smoke test script** — a simple script that runs the generator with test data and validates the output has no remaining `{{PLACEHOLDER}}` tokens
