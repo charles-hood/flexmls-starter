@@ -34,7 +34,7 @@ The script asks for your company info, FlexMLS ID, and optionally your agents. I
 - **A FlexMLS account** — your FlexMLS ID is in your dashboard URL: `my.flexmls.com/YourIDHere/search/...`
 - **bash** and **python3** — pre-installed on macOS and most Linux systems
 - **Your company info** — name, phone, email, address
-- **Images** (optional) — logo, social preview image, company photo, agent headshots
+- **Images** (optional) — logo (also used to auto-generate the favicon), social preview image, company photo, agent headshots
 
 ## Project Structure
 
@@ -61,7 +61,7 @@ flexmls-starter/
 my-realtor-site/
 ├── index.html           # Complete, ready-to-deploy
 ├── manifest.json        # PWA manifest
-├── favicon.png          # Browser favicon
+├── favicon.png          # Auto-generated from logo, or default
 ├── icon-192x192.png     # PWA icons
 ├── icon-512x512.png
 ├── logo.jpg             # Company logo
