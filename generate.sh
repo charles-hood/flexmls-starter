@@ -458,8 +458,18 @@ sed \
     -e "s|{{COMPANY_SHORT_NAME}}|${COMPANY_SHORT_NAME}|g" \
     "$TEMPLATE_DIR/manifest.json" > "$OUTPUT_DIR/manifest.json"
 
-# --- Copy default images ---
-cp "$DEFAULTS_DIR/favicon.png" "$OUTPUT_DIR/favicon.png"
+# --- Generate or copy favicon ---
+if [ -n "$LOGO_PATH" ] && [ -f "$LOGO_PATH" ] && command -v sips &>/dev/null; then
+    cp "$LOGO_PATH" "$OUTPUT_DIR/favicon.png"
+    sips -z 48 48 -s format png "$OUTPUT_DIR/favicon.png" --out "$OUTPUT_DIR/favicon.png" &>/dev/null
+    echo -e "  ${GREEN}Generated favicon from logo (sips)${NC}"
+elif [ -n "$LOGO_PATH" ] && [ -f "$LOGO_PATH" ] && command -v convert &>/dev/null; then
+    convert "$LOGO_PATH" -resize 48x48! -format png "$OUTPUT_DIR/favicon.png"
+    echo -e "  ${GREEN}Generated favicon from logo (ImageMagick)${NC}"
+else
+    cp "$DEFAULTS_DIR/favicon.png" "$OUTPUT_DIR/favicon.png"
+    echo -e "  ${YELLOW}Using default favicon${NC}"
+fi
 cp "$DEFAULTS_DIR/icon-192x192.png" "$OUTPUT_DIR/icon-192x192.png"
 cp "$DEFAULTS_DIR/icon-512x512.png" "$OUTPUT_DIR/icon-512x512.png"
 
